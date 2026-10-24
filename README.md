@@ -10,3 +10,29 @@ Analytics Vidhya practice problem: predict `Item_Outlet_Sales` for item-outlet p
 Approach: clean missing values, predict the raw target (not log) from `Item_MRP` and `Outlet_Identifier`, blending a regularized gradient-boosting model with per-outlet piecewise-linear regression.
 
 Run: `py bigmart_solution.py`
+
+## Leaderboard journey
+
+- **Initial rank: 203** -> **now: 306** (dropped as other participants improved).
+
+## Two solutions, two scores
+
+| Solution | Public RMSE | Verdict |
+|---|---|---|
+| `bigmart_solution.py` (raw target, `Item_MRP` + `Outlet_Identifier`, GBM blended with per-outlet piecewise-linear regression) | **1145.9888822358** | good score |
+| Staged pipeline below / `final_submission/solution.py` (sqrt target, more engineered features, blend of boosting models) | **1158.6890136233** | not a good score |
+
+The second approach had a better-looking 5-fold CV (1084.6) but scored worse on the public board: the extra
+features and boosting blend didn't generalise better than the simpler MRP x outlet model. The public split is
+only 25% of test, so it is noisy as well.
+
+## Staged pipeline (second solution)
+
+Each stage has a `.py` and an executed `.ipynb`; run them in order (they read `data/` and write `data/clean.csv`, `data/features.csv`).
+
+- `01_eda/` - missing values, skewed target, MRP and outlet effects (plots in `01_eda/plots/`)
+- `02_cleaning/` - unify fat-content labels, impute item weight / outlet size, fix zero visibility
+- `03_feature_engineering/` - item category, outlet age, price ratios, relative visibility, item count
+- `04_modeling/` - sqrt target, 5-fold CV, blend of HistGB / XGBoost / GBR -> `04_modeling/submission.csv`
+- `final_submission/solution.py` - the whole second solution in a single file (`final_submission/submission.csv`)
+- `build_notebooks.py` - rebuilds the notebooks from the `.py` files
